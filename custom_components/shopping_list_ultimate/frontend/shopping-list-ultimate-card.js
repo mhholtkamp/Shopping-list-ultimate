@@ -37,7 +37,7 @@ class ShoppingListUltimateCard extends HTMLElement {
       }
     } catch (err) { this.stop(); this.error(err.name === 'NotAllowedError' ? 'Cameratoegang is geweigerd.' : 'Camera kon niet worden gestart.'); }
   }
-  loadZxing() { if (window.ZXingBrowser) return Promise.resolve(); return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/local/shopping-list-ultimate-zxing.min.js';s.onload=resolve;s.onerror=()=>reject(new Error('Lokale barcodebibliotheek ontbreekt.'));document.head.appendChild(s);}); }
+  loadZxing() { if (window.ZXingBrowser) return Promise.resolve(); return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/shopping_list_ultimate/shopping-list-ultimate-zxing.min.js?v=0.1.1';s.onload=resolve;s.onerror=()=>reject(new Error('Lokale barcodebibliotheek ontbreekt.'));document.head.appendChild(s);}); }
   async found(code) { const now=Date.now(); if(this.lastCode===code && now-this.lastFound<3000) return; this.lastCode=code;this.lastFound=now;this.stop();await this.lookup(code); }
   stop() { this.scanning = false; this.controls?.stop(); this.controls=null; this.stream?.getTracks().forEach(t => t.stop()); const v=this.querySelector('video'); if(v) v.style.display='none'; }
   async lookup(barcode) {

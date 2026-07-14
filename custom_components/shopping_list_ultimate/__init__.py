@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
@@ -30,9 +32,14 @@ from .todo import async_add_todo_item
 
 PLATFORMS = ["sensor"]
 BARCODE_SCHEMA = vol.Schema({vol.Required("barcode"): cv.string})
+FRONTEND_URL = f"/{DOMAIN}"
+FRONTEND_PATH = Path(__file__).parent / "frontend"
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    await hass.http.async_register_static_paths(
+        [StaticPathConfig(FRONTEND_URL, str(FRONTEND_PATH), True)]
+    )
     store = ProductStore(hass)
     await store.async_load()
     coordinator = ShoppingCoordinator(hass, entry, store)
