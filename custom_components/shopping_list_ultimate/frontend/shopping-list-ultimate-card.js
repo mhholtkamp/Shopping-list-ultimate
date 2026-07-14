@@ -37,22 +37,23 @@ class ShoppingListUltimateCard extends HTMLElement {
       }
     } catch (err) { this.stop(); this.error(err.name === 'NotAllowedError' ? 'Cameratoegang is geweigerd.' : 'Camera kon niet worden gestart.'); }
   }
-  loadZxing() { if (window.ZXingBrowser) return Promise.resolve(); return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/shopping_list_ultimate/shopping-list-ultimate-zxing.min.js?v=0.1.1';s.onload=resolve;s.onerror=()=>reject(new Error('Lokale barcodebibliotheek ontbreekt.'));document.head.appendChild(s);}); }
+  loadZxing() { if (window.ZXingBrowser) return Promise.resolve(); return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='/shopping_list_ultimate/shopping-list-ultimate-zxing.min.js?v=0.1.2';s.onload=resolve;s.onerror=()=>reject(new Error('Lokale barcodebibliotheek ontbreekt.'));document.head.appendChild(s);}); }
   async found(code) { const now=Date.now(); if(this.lastCode===code && now-this.lastFound<3000) return; this.lastCode=code;this.lastFound=now;this.stop();await this.lookup(code); }
   stop() { this.scanning = false; this.controls?.stop(); this.controls=null; this.stream?.getTracks().forEach(t => t.stop()); const v=this.querySelector('video'); if(v) v.style.display='none'; }
+  callWithResponse(service, serviceData) { return this._hass.callWS({type:'call_service',domain:'shopping_list_ultimate',service,service_data:serviceData,return_response:true}); }
   async lookup(barcode) {
     if (!barcode) return; this.error('Product opzoeken…');
-    try { const result = await this._hass.callService('shopping_list_ultimate','lookup_barcode',{barcode}, {}, true); this.product=result.response?.product; if(!this.product) return this.unknown(barcode); this.showProduct(); }
+    try { const result = await this.callWithResponse('lookup_barcode',{barcode}); this.product=result.response?.product; if(!this.product) return this.unknown(barcode); this.showProduct(); }
     catch (err) { this.error(err.message || 'Product kon niet worden opgezocht.'); }
   }
   unknown(barcode) {
     this.error('Barcode onbekend');
     const name = prompt(`Barcode ${barcode}\nProductnaam:`); if (!name) return;
     const category = prompt('Categorie (optioneel):') || '';
-    this._hass.callService('shopping_list_ultimate','add_product',{barcode,name,category}, {}, true).then(r=>{this.product=r.response?.product;this.showProduct();});
+    this.callWithResponse('add_product',{barcode,name,category}).then(r=>{this.product=r.response?.product;this.showProduct();});
   }
   showProduct() { this.error(''); const p=this.product, el=this.querySelector('.product'); el.style.display='grid'; el.querySelector('img').src=p.image||''; el.querySelector('h3').textContent=p.custom_name||p.name||p.barcode; el.querySelector('.meta').textContent=[p.brand,p.quantity].filter(Boolean).join(' · '); }
-  async add() { try { await this._hass.callService('shopping_list_ultimate','add_barcode',{barcode:this.product.barcode,quantity:this.quantity,todo_entity:this.config.todo_entity}, {}, true); this.error('Toegevoegd aan de boodschappenlijst.'); } catch(err) { this.error(err.message||'Toevoegen is mislukt.'); } }
+  async add() { try { await this._hass.callService('shopping_list_ultimate','add_barcode',{barcode:this.product.barcode,quantity:this.quantity,todo_entity:this.config.todo_entity}); this.error('Toegevoegd aan de boodschappenlijst.'); } catch(err) { this.error(err.message||'Toevoegen is mislukt.'); } }
   renderRecent() { const root=this.querySelector?.('.recent-list'); if(!root||!this._hass)return; const state=this._hass.states['sensor.shopping_list_ultimate_known_products']; const products=state?.attributes?.recent_products||[]; root.innerHTML=products.map((p,i)=>`<div class="recent-item" data-i="${i}"><img src="${p.image||''}"><div>${p.custom_name||p.name||p.barcode}<small>${p.scan_count||0} scans · ${p.last_scanned?new Date(p.last_scanned).toLocaleString():''}</small></div></div>`).join(''); root.querySelectorAll('.recent-item').forEach(el=>el.onclick=()=>{this.product=products[Number(el.dataset.i)];this.setQuantity(1);this.showProduct();this.add();}); }
   disconnectedCallback(){this.stop();}
 }

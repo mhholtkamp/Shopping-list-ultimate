@@ -24,11 +24,11 @@ Een Home Assistant-integratie om EAN/UPC-barcodes te scannen, producten lokaal o
 1. Open HACS → Integraties → menu → **Aangepaste repositories**.
 2. Voeg de GitHub-URL van deze repository toe als categorie **Integratie**.
 3. Installeer Shopping List Ultimate en herstart Home Assistant.
-4. Voeg `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.1` toe als JavaScript-module via **Dashboard → Bronnen**. Kopiëren naar `/config/www` is niet nodig.
+4. Voeg `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.2` toe als JavaScript-module via **Dashboard → Bronnen**. Kopiëren naar `/config/www` is niet nodig.
 
 ### Handmatig
 
-Kopieer `custom_components/shopping_list_ultimate` naar `/config/custom_components/` en herstart Home Assistant. Voeg daarna `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.1` toe als JavaScript-module via **Dashboard → Bronnen**.
+Kopieer `custom_components/shopping_list_ultimate` naar `/config/custom_components/` en herstart Home Assistant. Voeg daarna `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.2` toe als JavaScript-module via **Dashboard → Bronnen**.
 
 ## Configuratie
 
