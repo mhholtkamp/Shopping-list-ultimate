@@ -19,10 +19,7 @@ class Barcode:
 
 def _valid_mod10(value: str) -> bool:
     digits = [int(char) for char in value]
-    total = sum(
-        digit * (3 if (len(digits) - index) % 2 == 0 else 1)
-        for index, digit in enumerate(digits[:-1])
-    )
+    total = sum(digit * (3 if (len(digits) - index) % 2 == 0 else 1) for index, digit in enumerate(digits[:-1]))
     return (10 - total % 10) % 10 == digits[-1]
 
 

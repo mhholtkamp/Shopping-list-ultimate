@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from typing import Any
 
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, ServiceCall, SupportsResponse
 from homeassistant.exceptions import HomeAssistantError
-import homeassistant.helpers.config_validation as cv
 
 from .barcode import InvalidBarcode
 from .const import (
@@ -48,7 +48,14 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unloaded := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
         if not hass.data[DOMAIN]:
-            for service in (SERVICE_LOOKUP_BARCODE, SERVICE_ADD_BARCODE, SERVICE_ADD_PRODUCT, SERVICE_UPDATE_PRODUCT, SERVICE_DELETE_PRODUCT, SERVICE_REFRESH_PRODUCT):
+            for service in (
+                SERVICE_LOOKUP_BARCODE,
+                SERVICE_ADD_BARCODE,
+                SERVICE_ADD_PRODUCT,
+                SERVICE_UPDATE_PRODUCT,
+                SERVICE_DELETE_PRODUCT,
+                SERVICE_REFRESH_PRODUCT,
+            ):
                 hass.services.async_remove(DOMAIN, service)
     return unloaded
 
@@ -81,12 +88,31 @@ async def _async_register_services(hass: HomeAssistant) -> None:
         if not product:
             raise HomeAssistantError("Product not found")
         options = {**coordinator.entry.data, **coordinator.entry.options}
-        await async_add_todo_item(hass, call.data.get("todo_entity", options[CONF_TODO_ENTITY]), display_name(product), call.data.get("quantity", 1), call.data.get("note"), options[CONF_MERGE_DUPLICATES])
+        await async_add_todo_item(
+            hass,
+            call.data.get("todo_entity", options[CONF_TODO_ENTITY]),
+            display_name(product),
+            call.data.get("quantity", 1),
+            call.data.get("note"),
+            options[CONF_MERGE_DUPLICATES],
+        )
         return {"product": product}
 
     async def add_product(call: ServiceCall) -> dict[str, Any]:
         coordinator = _coordinator(hass)
-        product = await coordinator.store.upsert({"barcode": call.data["barcode"], "name": call.data[CONF_NAME], "custom_name": None, "brand": call.data.get("brand", ""), "category": call.data.get("category", ""), "image": call.data.get("image", ""), "quantity": call.data.get("product_quantity", ""), "country": "", "source": "manual"})
+        product = await coordinator.store.upsert(
+            {
+                "barcode": call.data["barcode"],
+                "name": call.data[CONF_NAME],
+                "custom_name": None,
+                "brand": call.data.get("brand", ""),
+                "category": call.data.get("category", ""),
+                "image": call.data.get("image", ""),
+                "quantity": call.data.get("product_quantity", ""),
+                "country": "",
+                "source": "manual",
+            }
+        )
         await coordinator.async_refresh()
         return {"product": product}
 
@@ -119,9 +145,58 @@ async def _async_register_services(hass: HomeAssistant) -> None:
         await coordinator.async_refresh()
         return {"product": product}
 
-    hass.services.async_register(DOMAIN, SERVICE_LOOKUP_BARCODE, lookup, schema=BARCODE_SCHEMA, supports_response=SupportsResponse.ONLY)
-    hass.services.async_register(DOMAIN, SERVICE_ADD_BARCODE, add_barcode, schema=BARCODE_SCHEMA.extend({vol.Optional("todo_entity"): cv.entity_id, vol.Optional("quantity", default=1): vol.All(vol.Coerce(int), vol.Range(min=1)), vol.Optional("note"): cv.string}), supports_response=SupportsResponse.OPTIONAL)
-    hass.services.async_register(DOMAIN, SERVICE_ADD_PRODUCT, add_product, schema=BARCODE_SCHEMA.extend({vol.Required(CONF_NAME): cv.string, vol.Optional("brand"): cv.string, vol.Optional("category"): cv.string, vol.Optional("image"): cv.url, vol.Optional("product_quantity"): cv.string}), supports_response=SupportsResponse.OPTIONAL)
-    hass.services.async_register(DOMAIN, SERVICE_UPDATE_PRODUCT, update_product, schema=BARCODE_SCHEMA.extend({vol.Optional("custom_name"): cv.string, vol.Optional(CONF_NAME): cv.string, vol.Optional("brand"): cv.string, vol.Optional("category"): cv.string, vol.Optional("image"): cv.url, vol.Optional("quantity"): cv.string}), supports_response=SupportsResponse.OPTIONAL)
+    hass.services.async_register(
+        DOMAIN, SERVICE_LOOKUP_BARCODE, lookup, schema=BARCODE_SCHEMA, supports_response=SupportsResponse.ONLY
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_ADD_BARCODE,
+        add_barcode,
+        schema=BARCODE_SCHEMA.extend(
+            {
+                vol.Optional("todo_entity"): cv.entity_id,
+                vol.Optional("quantity", default=1): vol.All(vol.Coerce(int), vol.Range(min=1)),
+                vol.Optional("note"): cv.string,
+            }
+        ),
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_ADD_PRODUCT,
+        add_product,
+        schema=BARCODE_SCHEMA.extend(
+            {
+                vol.Required(CONF_NAME): cv.string,
+                vol.Optional("brand"): cv.string,
+                vol.Optional("category"): cv.string,
+                vol.Optional("image"): cv.url,
+                vol.Optional("product_quantity"): cv.string,
+            }
+        ),
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_UPDATE_PRODUCT,
+        update_product,
+        schema=BARCODE_SCHEMA.extend(
+            {
+                vol.Optional("custom_name"): cv.string,
+                vol.Optional(CONF_NAME): cv.string,
+                vol.Optional("brand"): cv.string,
+                vol.Optional("category"): cv.string,
+                vol.Optional("image"): cv.url,
+                vol.Optional("quantity"): cv.string,
+            }
+        ),
+        supports_response=SupportsResponse.OPTIONAL,
+    )
     hass.services.async_register(DOMAIN, SERVICE_DELETE_PRODUCT, delete_product, schema=BARCODE_SCHEMA)
-    hass.services.async_register(DOMAIN, SERVICE_REFRESH_PRODUCT, refresh_product, schema=BARCODE_SCHEMA, supports_response=SupportsResponse.OPTIONAL)
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_REFRESH_PRODUCT,
+        refresh_product,
+        schema=BARCODE_SCHEMA,
+        supports_response=SupportsResponse.OPTIONAL,
+    )

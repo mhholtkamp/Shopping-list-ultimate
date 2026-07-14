@@ -32,7 +32,10 @@ async def async_add_todo_item(
             if raw.get("status") != TodoItemStatus.COMPLETED and (summary == name or summary.startswith(f"{name} ×")):
                 old_quantity = int(summary.rsplit("×", 1)[1]) if " ×" in summary else 1
                 await hass.services.async_call(
-                    "todo", "update_item", {ATTR_ENTITY_ID: entity_id, "item": raw["uid"], "rename": f"{name} ×{old_quantity + quantity}"}, blocking=True
+                    "todo",
+                    "update_item",
+                    {ATTR_ENTITY_ID: entity_id, "item": raw["uid"], "rename": f"{name} ×{old_quantity + quantity}"},
+                    blocking=True,
                 )
                 return
     data: dict[str, Any] = {ATTR_ENTITY_ID: entity_id, "item": target_name}

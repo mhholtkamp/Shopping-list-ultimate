@@ -31,7 +31,11 @@ class ShoppingCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         products = self.store.all()
-        return {"products": products, "known_products": len(products), "total_scans": sum(p["scan_count"] for p in products)}
+        return {
+            "products": products,
+            "known_products": len(products),
+            "total_scans": sum(p["scan_count"] for p in products),
+        }
 
     async def async_lookup(self, raw_barcode: str, *, record_scan: bool = True) -> dict[str, Any] | None:
         barcode = validate_barcode(raw_barcode).value
@@ -42,9 +46,14 @@ class ShoppingCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if product and record_scan:
             product = await self.store.upsert(product, scanned=True)
         self.last_scanned = product or {"barcode": barcode, "source": source}
-        self.hass.bus.async_fire(EVENT_BARCODE_SCANNED, {
-            "barcode": barcode, "found": product is not None,
-            "product_name": (product or {}).get("custom_name") or (product or {}).get("name"), "source": source,
-        })
+        self.hass.bus.async_fire(
+            EVENT_BARCODE_SCANNED,
+            {
+                "barcode": barcode,
+                "found": product is not None,
+                "product_name": (product or {}).get("custom_name") or (product or {}).get("name"),
+                "source": source,
+            },
+        )
         await self.async_refresh()
         return product

@@ -42,7 +42,12 @@ class OpenFoodFactsClient:
 
     async def lookup(self, barcode: str) -> dict[str, Any] | None:
         url = f"https://world.openfoodfacts.org/api/v2/product/{barcode}.json"
-        params = {"fields": "code,product_name,generic_name,brands,categories_tags,image_front_url,image_url,quantity,countries_tags"}
+        params = {
+            "fields": (
+                "code,product_name,generic_name,brands,categories_tags,"
+                "image_front_url,image_url,quantity,countries_tags"
+            )
+        }
         headers = {"User-Agent": USER_AGENT, "Accept-Language": self._language}
         try:
             async with self._session.get(url, params=params, headers=headers, timeout=15) as response:
