@@ -3,7 +3,7 @@
   "name": "Shopping List Ultimate",
   "codeowners": ["@mhholtkamp"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["http"],
   "documentation": "https://github.com/mhholtkamp/Shopping-list-ultimate",
   "integration_type": "service",
   "iot_class": "cloud_polling",
