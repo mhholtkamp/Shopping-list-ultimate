@@ -5,7 +5,7 @@ from custom_components.shopping_list_ultimate.barcode import InvalidBarcode, val
 
 @pytest.mark.parametrize(
     ("code", "kind"),
-    [("4006381333931", "EAN-13"), ("96385074", "EAN-8"), ("036000291452", "UPC-A"), ("04210005", "UPC-E")],
+    [("4006381333931", "EAN-13"), ("96385074", "EAN-8"), ("036000291452", "UPC-A"), ("04252614", "UPC-E")],
 )
 def test_valid_barcodes(code, kind):
     assert validate_barcode(code).format == kind
