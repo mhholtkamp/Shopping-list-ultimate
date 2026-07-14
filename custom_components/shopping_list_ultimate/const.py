@@ -1,7 +1,7 @@
 """Constants for Shopping List Ultimate."""
 
 DOMAIN = "shopping_list_ultimate"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.products"
 

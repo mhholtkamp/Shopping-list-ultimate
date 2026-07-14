@@ -24,11 +24,11 @@ Een Home Assistant-integratie om EAN/UPC-barcodes te scannen, producten lokaal o
 1. Open HACS → Integraties → menu → **Aangepaste repositories**.
 2. Voeg de GitHub-URL van deze repository toe als categorie **Integratie**.
 3. Installeer Shopping List Ultimate en herstart Home Assistant.
-4. Kopieer `www/shopping-list-ultimate-card.js` en `www/shopping-list-ultimate-zxing.min.js` naar `/config/www/` en voeg `/local/shopping-list-ultimate-card.js` toe als JavaScript-module via Dashboard → Bronnen.
+4. Voeg `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.1` toe als JavaScript-module via **Dashboard → Bronnen**. Kopiëren naar `/config/www` is niet nodig.
 
 ### Handmatig
 
-Kopieer `custom_components/shopping_list_ultimate` naar `/config/custom_components/`, kopieer beide JavaScript-bestanden uit `www` naar `/config/www/` en herstart Home Assistant.
+Kopieer `custom_components/shopping_list_ultimate` naar `/config/custom_components/` en herstart Home Assistant. Voeg daarna `/shopping_list_ultimate/shopping-list-ultimate-card.js?v=0.1.1` toe als JavaScript-module via **Dashboard → Bronnen**.
 
 ## Configuratie
 
@@ -131,7 +131,6 @@ CI voert Ruff, Pytest, Hassfest en HACS-validatie uit.
 ## Bekende beperkingen
 
 - Bewerken gebruikt in deze eerste versie de Home Assistant-services; een aparte visuele bewerkdialoog volgt in een latere frontendrelease.
-- Het Lovelace-bestand moet apart naar `www` worden gekopieerd; HACS installeert een integratierepository niet als frontend-plugin.
 - Open Food Facts-resultaten hangen af van door de community ingevulde productgegevens.
 
 ## Licentie
