@@ -1,0 +1,31 @@
+lookup_barcode:
+  fields:
+    barcode:
+      required: true
+      selector: {text: {}}
+add_barcode:
+  fields:
+    barcode: {required: true, selector: {text: {}}}
+    todo_entity: {selector: {entity: {domain: todo}}}
+    quantity: {default: 1, selector: {number: {min: 1, max: 99, mode: box}}}
+    note: {selector: {text: {multiline: true}}}
+add_product:
+  fields:
+    barcode: {required: true, selector: {text: {}}}
+    name: {required: true, selector: {text: {}}}
+    brand: {selector: {text: {}}}
+    category: {selector: {text: {}}}
+    image: {selector: {text: {type: url}}}
+    product_quantity: {selector: {text: {}}}
+update_product:
+  fields:
+    barcode: {required: true, selector: {text: {}}}
+    custom_name: {selector: {text: {}}}
+    category: {selector: {text: {}}}
+    image: {selector: {text: {type: url}}}
+delete_product:
+  fields:
+    barcode: {required: true, selector: {text: {}}}
+refresh_product:
+  fields:
+    barcode: {required: true, selector: {text: {}}}

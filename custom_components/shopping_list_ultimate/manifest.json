@@ -1,0 +1,13 @@
+{
+  "domain": "shopping_list_ultimate",
+  "name": "Shopping List Ultimate",
+  "codeowners": ["@mhholtkamp"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/mhholtkamp/Shopping-list-ultimate",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/mhholtkamp/Shopping-list-ultimate/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
